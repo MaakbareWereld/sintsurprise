@@ -2,50 +2,50 @@
 //initiate the servos:
 Servo lidServo;
 int lidServoPin = A4;
-int lidOpen = 61;
+int lidOpen = 61; // in degrees
 int lidClose = 0;
 int lidStatus = 0;
-int curLidPos = 0;
 
 Servo lockServo;
 int lockServoPin = A5;
 int lockOpenPos = 0;
 int lockClosePos = 90;
 
-
-int ledPin = D7;
+//have a manual pin to open the box
 int doorKnobPin = D0;
 
 void setup() {
-    lidServo.attach(lidServoPin);
-    lockServo.attach(lockServoPin);
-    //lidServo.write(lidClose);
-    //lockServo.write(lockClosePos);
+  //initiate the servos
+  lidServo.attach(lidServoPin);
+  lockServo.attach(lockServoPin);
 
-    pinMode(ledPin,OUTPUT);
-    pinMode(doorKnobPin,INPUT_PULLDOWN);
-    Particle.function("testSurprise",surprise);
-    Particle.function("lock",lock);
-    Particle.variable("lidPos",curLidPos);
+  //initiatie the manual pin
+  pinMode(doorKnobPin,INPUT_PULLDOWN);
+
+  //these functions can be called from the Particle Cloud.
+  Particle.function("testSurprise",surprise);
+  Particle.function("lock",lock);
 
 }
 
 void loop() {
-    if (Particle.connected()){
-        digitalWrite(ledPin, HIGH);
-    } else{
-        digitalWrite(ledPin, LOW);
-    }
-    if (digitalRead(doorKnobPin)==HIGH){
-        surprise("open");
-        delay(100);
-    }
-    if (lidStatus == 1){
-      while(1);
-    }
+
+  //test for the doorKnobPin, if connected, open the box
+  if (digitalRead(doorKnobPin)==HIGH){
+    surprise("open");
+    delay(100);
+  }
+
+  //once the box has been opened, this hangs the code, and also freezes the
+  //servo, so the lid will not close anymore.
+  if (lidStatus == 1){
+    while(1);
+  }
 }
 
 int surprise(String command){
+  //open both the lock and the lid, in succesion. The for loop for the lid is
+  //needed to keep it in check: otherwise it flips open too fast.
   if (command == "open"){
     lockServo.write(lockOpenPos);
     delay(250);
