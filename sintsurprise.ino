@@ -53,7 +53,6 @@ int surprise(String command){
       lidServo.write(n);
       delay(50);
     }
-    curLidPos=lidServo.read();
     lidServo.detach();
     lidStatus = 1;
 
@@ -67,7 +66,6 @@ int surprise(String command){
     }
     lockServo.write(lockClosePos);
     delay(10);
-    curLidPos=lidServo.read();
     } else {
       return -1;
     }
